@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cc0903990521a8479adf303c06f171a, type: 3}
+  m_Name: "\u0413\u0440\u0438\u043F\u043F"
+  m_EditorClassIdentifier: 
+  Name: "\u0413\u0440\u0438\u043F\u043F"
+  Symptoms:
+  - {fileID: 11400000, guid: 2538e303b40bf8141a126143f992d125, type: 2}
+  - {fileID: 11400000, guid: 971d37299433f1e43849d072c03fe7d9, type: 2}
+  - {fileID: 11400000, guid: a0ec253f467d9cf43935fec7c1ca2d36, type: 2}
+  - {fileID: 11400000, guid: a121c391755262d42a0c72ceadf220fc, type: 2}
+  - {fileID: 11400000, guid: e85075b9dace6194eb68a61fa9898a3a, type: 2}
+  - {fileID: 11400000, guid: 35b775884fee6a9428edaf7a441a93f4, type: 2}
+  - {fileID: 11400000, guid: 658da0d944bae5a44bcc0e502e920d24, type: 2}
+  Medications:
+  - {fileID: 11400000, guid: 158f357bdc7a70d42bf411d1bad7efce, type: 2}
+  - {fileID: 11400000, guid: 2316defebd9b66249a1ffb2889fa33d3, type: 2}
+  - {fileID: 11400000, guid: 6dd94b35c844ade4fb0e405b8120449f, type: 2}
+  - {fileID: 11400000, guid: 0bff43badf2c6be48a37730e39fc01b0, type: 2}
+  - {fileID: 11400000, guid: c83bfadb761dffb43baa0a8be10f66e7, type: 2}
