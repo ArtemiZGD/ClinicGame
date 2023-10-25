@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Analytics;
@@ -11,9 +11,11 @@ using Random = UnityEngine.Random;
 
 public class PatientGenerator : MonoBehaviour
 {
+	[Header("Names")]
 	[SerializeField] private List<string> _firstNames = new();
 	[SerializeField] private List<string> _secondNames = new();
 
+	[Header("Icons")]
 	[SerializeField] private Sprite _patient_8_25_M_Image;
 	[SerializeField] private Sprite _patient_8_25_F_Image;
 	[SerializeField] private Sprite _patient_26_60_M_Image;
@@ -21,41 +23,122 @@ public class PatientGenerator : MonoBehaviour
 	[SerializeField] private Sprite _patient_61_90_M_Image;
 	[SerializeField] private Sprite _patient_61_90_F_Image;
 
+	[Header("Age")]
 	[SerializeField] private int _minAge = 8;
 	[SerializeField] private int _maxAge = 90;
 	[SerializeField] private int _currentYear = 2023;
 
+	[Header("UI")]
 	[SerializeField] private Image _patientIcon;
 	[SerializeField] private TMP_Text _patientInfoText;
 	[SerializeField] private TMP_Text _symptomsText;
+	[SerializeField] private TMP_InputField _deseaseInput;
+	[SerializeField] private TMP_InputField _medicationsInput;
 
 	[SerializeField] private Vector2Int _symptomsCountRange = new(3, 3);
 
 	private List<DiseaseData> _diseases;
+	private Patient _patient;
 
-	private void Start()
+	public void CheckAnswer()
 	{
-		_diseases = LoadDiseaseDataFromFolder("ScriptableObjects/Diseases");
-		GeneratePatient();
+		bool isDeseaseCorrect = _deseaseInput.text.ToLower() == _patient.Disease.Name.ToLower();
+
+		if (isDeseaseCorrect)
+		{
+			List<string> medicationsInput = SplitString(_medicationsInput.text);
+			List<string> medicationsCorrect = new();
+
+			foreach (var medication in _patient.Disease.Medications)
+			{
+				medicationsCorrect.Add(medication.Name);
+			}
+
+			medicationsInput.Sort();
+			medicationsCorrect.Sort();
+
+			if (medicationsCorrect.Count == medicationsInput.Count)
+			{
+				bool isCorrect = true;
+
+				for (int i = 0; i < medicationsInput.Count; i++)
+				{
+					if (medicationsInput[i].ToLower() != medicationsCorrect[i].ToLower())
+						isCorrect = false;
+				}
+
+				if (isCorrect)
+				{
+					GeneratePatient();
+				}
+				else
+				{
+					Debug.Log("Не верные препараты");
+				}
+			}
+			else
+			{
+				Debug.Log("Не верные препараты");
+			}
+		}
+		else
+		{
+			Debug.Log("Не верная болезнь");
+		}
 	}
 
 	public void GeneratePatient()
 	{
-		string fullName = GenerateRandomFullName();
-		Gender gender = (Gender)Random.Range((int)Gender.Male, (int)Gender.Female + 1);
-		int age = Random.Range(_minAge, _maxAge + 1);
-		Sprite image = GetPatienImage(gender, age);
-		DiseaseData disease = _diseases[Random.Range(0, _diseases.Count)];
+		_deseaseInput.text = "";
+		_medicationsInput.text = "";
 
-		List<string> selectedSymptoms = GetRandomUniqueSymptoms(disease);
+		_patient = new Patient();
+		_patient.FullName = GenerateRandomFullName();
+		_patient.Age = Random.Range(_minAge, _maxAge + 1);
+		_patient.Gender = (Gender)Random.Range((int)Gender.Male, (int)Gender.Female + 1);
+		_patient.Sprite = GetPatienImage(_patient.Gender, _patient.Age);
+		_patient.Disease = _diseases[Random.Range(0, _diseases.Count)];
 
+		_patient.SelectedSymptoms = GetRandomUniqueSymptoms(_patient.Disease);
+
+		DisplayPatient();
+
+		Debug.Log(_patient.Disease.Name);
+	}
+
+	private void Start()
+	{
+		if (_symptomsCountRange.x > _symptomsCountRange.y)
+			Debug.LogError("Wrong SymptomsCountRange");
+
+		_diseases = LoadDiseaseDataFromFolder("ScriptableObjects/Diseases");
+		GeneratePatient();
+	}
+
+	private List<string> SplitString(string str)
+	{
+		List<string> strings = str.Split(',', '.', '\n').ToList();
+
+		for (int i = strings.Count - 1; i >= 0; i--)
+		{
+			if (strings[i].Trim() == "")
+			{
+				strings.RemoveAt(i);
+			}
+		}
+
+		return strings;
+	}
+
+	private void DisplayPatient()
+	{
 		string genderRus = "Null";
 
-		if (gender == Gender.Male)
+		if (_patient.Gender == Gender.Male)
 		{
 			genderRus = "М";
 		}
-		else if (gender == Gender.Female)
+		else if (_patient.Gender == Gender.Female)
 		{
 			genderRus = "Ж";
 		}
@@ -64,9 +147,9 @@ public class PatientGenerator : MonoBehaviour
 			Debug.LogError("Not polite gender");
 		}
 
-		_patientInfoText.text = $"{fullName}, {_currentYear - age}, {genderRus}";
-		_symptomsText.text = string.Join("\n", selectedSymptoms);
-		_patientIcon.sprite = image;
+		_patientInfoText.text = $"{_patient.FullName}, {_currentYear - _patient.Age}, {genderRus}";
+		_symptomsText.text = string.Join("\n", _patient.SelectedSymptoms);
+		_patientIcon.sprite = _patient.Sprite;
 	}
 
 	private List<string> GetRandomUniqueSymptoms(DiseaseData disease)
