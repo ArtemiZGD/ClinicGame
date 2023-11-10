@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.UI;
@@ -34,11 +33,20 @@ public class PatientGenerator : MonoBehaviour
 	[SerializeField] private TMP_Text _symptomsText;
 	[SerializeField] private TMP_InputField _deseaseInput;
 	[SerializeField] private TMP_InputField _medicationsInput;
+	[SerializeField] private List<Image> _hearts = new();
+	[SerializeField] private Color _brokenHeartColor = Color.black;
+	[SerializeField] private Color _fullHeartColor = Color.white;
+	[SerializeField] private string _stringToJoin = ";";
 
 	[SerializeField] private Vector2Int _symptomsCountRange = new(3, 3);
 
+	[Header("Menu")]
+	[SerializeField] private GameObject _gameOverMenu;
+	[SerializeField] private ScreenSwitcher ScreenSwitcher;
+
 	private List<DiseaseData> _diseases;
 	private Patient _patient;
+	private int _hp;
 
 	public void CheckAnswer()
 	{
@@ -73,16 +81,19 @@ public class PatientGenerator : MonoBehaviour
 				}
 				else
 				{
+					HealthDown();
 					Debug.Log("Не верные препараты");
 				}
 			}
 			else
 			{
+				HealthDown();
 				Debug.Log("Не верные препараты");
 			}
 		}
 		else
 		{
+			HealthDown();
 			Debug.Log("Не верная болезнь");
 		}
 	}
@@ -113,6 +124,42 @@ public class PatientGenerator : MonoBehaviour
 
 		_diseases = LoadDiseaseDataFromFolder("ScriptableObjects/Diseases");
 		GeneratePatient();
+
+		_hp = _hearts.Count();
+	}
+
+	private void HealthDown()
+	{
+		_hp--;
+		SetHealth();
+
+		if (_hp == 0)
+		{
+			GameOver();
+		}
+	}
+
+	private void GameOver()
+	{
+		_hp = _hearts.Count;
+		SetHealth();
+		GeneratePatient();
+		ScreenSwitcher.SwitchObjects(_gameOverMenu);
+	}
+
+	private void SetHealth()
+	{
+		for (int i = 0; i < _hearts.Count; i++)
+		{
+			if (i < _hp)
+			{
+				_hearts[i].color = _fullHeartColor;
+			}
+			else
+			{
+				_hearts[i].color = _brokenHeartColor;
+			}
+		}
 	}
 
 	private List<string> SplitString(string str)
@@ -148,7 +195,8 @@ public class PatientGenerator : MonoBehaviour
 		}
 
 		_patientInfoText.text = $"{_patient.FullName}, {_currentYear - _patient.Age}, {genderRus}";
-		_symptomsText.text = string.Join("\n", _patient.SelectedSymptoms);
+		_symptomsText.text = string.Join($"{_stringToJoin}\n", _patient.SelectedSymptoms);
+		_symptomsText.text += _stringToJoin;
 		_patientIcon.sprite = _patient.Sprite;
 	}
 
@@ -162,6 +210,11 @@ public class PatientGenerator : MonoBehaviour
 
 		do
 		{
+			if (allSymptoms.Count == 0)
+			{
+				Debug.LogError("The symptoms aren't clear-cut");
+			}
+
 			SymptomData symptomData = allSymptoms[Random.Range(0, allSymptoms.Count)];
 			selectedSymptoms.Add(symptomData);
 			allSymptoms.Remove(symptomData);
@@ -172,7 +225,7 @@ public class PatientGenerator : MonoBehaviour
 			}
 
 			attempts++;
-		} while (GetDiseasesCount(selectedSymptoms) != 1 || attempts <= minAttempts);
+		} while (GetDiseasesCount(selectedSymptoms) != 1 || (attempts <= minAttempts && allSymptoms.Count != 0));
 
 		List<string> selectedSymptomNames = new();
 
@@ -209,8 +262,7 @@ public class PatientGenerator : MonoBehaviour
 
 		return diseaseList;
 	}
-
-
+	
 	private Sprite GetPatienImage(Gender gender, int age)
 	{
 		Sprite image = null;

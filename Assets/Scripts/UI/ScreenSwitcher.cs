@@ -7,16 +7,6 @@ public class ScreenSwitcher : MonoBehaviour
 
 	private List<GameObject> _objectsToHide = new();
 
-	private void Start()
-	{
-		foreach (Transform obj in transform)
-		{
-			_objectsToHide.Add(obj.gameObject);
-		}
-
-		SwitchObjects(_startMenu);
-	}
-
 	public void SwitchObjects(GameObject objectToActivate)
 	{
 		foreach (var obj in _objectsToHide)
@@ -25,5 +15,15 @@ public class ScreenSwitcher : MonoBehaviour
 		}
 
 		objectToActivate.SetActive(true);
+	}
+
+	private void Start()
+	{
+		foreach (Transform obj in transform)
+		{
+			_objectsToHide.Add(obj.gameObject);
+		}
+
+		SwitchObjects(_startMenu);
 	}
 }
