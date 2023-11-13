@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Analytics;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class PatientGenerator : MonoBehaviour
@@ -15,38 +12,26 @@ public class PatientGenerator : MonoBehaviour
 	[SerializeField] private List<string> _firstNames = new();
 	[SerializeField] private List<string> _secondNames = new();
 
-	[Header("Icons")]
-	[SerializeField] private Sprite _patient_8_25_M_Image;
-	[SerializeField] private Sprite _patient_8_25_F_Image;
-	[SerializeField] private Sprite _patient_26_60_M_Image;
-	[SerializeField] private Sprite _patient_26_60_F_Image;
-	[SerializeField] private Sprite _patient_61_90_M_Image;
-	[SerializeField] private Sprite _patient_61_90_F_Image;
-
 	[Header("Age")]
 	[SerializeField] private int _minAge = 8;
 	[SerializeField] private int _maxAge = 90;
-	[SerializeField] private int _currentYear = 2023;
 
-	[Header("UI")]
-	[SerializeField] private Image _patientIcon;
-	[SerializeField] private TMP_Text _patientInfoText;
-	[SerializeField] private TMP_Text _symptomsText;
-	[SerializeField] private TMP_InputField _deseaseInput;
-	[SerializeField] private TMP_InputField _medicationsInput;
-
+	[Header("Symptoms")]
 	[SerializeField] private Vector2Int _symptomsCountRange = new(3, 3);
+
+	[Header("Display")]
+	[SerializeField] private PatientDisplay _patientDisplay;
 
 	private List<DiseaseData> _diseases;
 	private Patient _patient;
 
-	public void CheckAnswer()
+	public void CheckAnswer(string desease, string medications)
 	{
-		bool isDeseaseCorrect = _deseaseInput.text.ToLower() == _patient.Disease.Name.ToLower();
+		bool isDeseaseCorrect = desease.ToLower() == _patient.Disease.Name.ToLower();
 
 		if (isDeseaseCorrect)
 		{
-			List<string> medicationsInput = SplitString(_medicationsInput.text);
+			List<string> medicationsInput = SplitString(medications);
 			List<string> medicationsCorrect = new();
 
 			foreach (var medication in _patient.Disease.Medications)
@@ -89,19 +74,15 @@ public class PatientGenerator : MonoBehaviour
 
 	public void GeneratePatient()
 	{
-		_deseaseInput.text = "";
-		_medicationsInput.text = "";
-
 		_patient = new Patient();
 		_patient.FullName = GenerateRandomFullName();
 		_patient.Age = Random.Range(_minAge, _maxAge + 1);
 		_patient.Gender = (Gender)Random.Range((int)Gender.Male, (int)Gender.Female + 1);
-		_patient.Sprite = GetPatienImage(_patient.Gender, _patient.Age);
 		_patient.Disease = _diseases[Random.Range(0, _diseases.Count)];
 
 		_patient.SelectedSymptoms = GetRandomUniqueSymptoms(_patient.Disease);
 
-		DisplayPatient();
+		_patientDisplay.DisplayPatient(_patient);
 
 		Debug.Log(_patient.Disease.Name);
 	}
@@ -128,28 +109,6 @@ public class PatientGenerator : MonoBehaviour
 		}
 
 		return strings;
-	}
-
-	private void DisplayPatient()
-	{
-		string genderRus = "Null";
-
-		if (_patient.Gender == Gender.Male)
-		{
-			genderRus = "Ì";
-		}
-		else if (_patient.Gender == Gender.Female)
-		{
-			genderRus = "Æ";
-		}
-		else
-		{
-			Debug.LogError("Not polite gender");
-		}
-
-		_patientInfoText.text = $"{_patient.FullName}, {_currentYear - _patient.Age}, {genderRus}";
-		_symptomsText.text = string.Join("\n", _patient.SelectedSymptoms);
-		_patientIcon.sprite = _patient.Sprite;
 	}
 
 	private List<string> GetRandomUniqueSymptoms(DiseaseData disease)
@@ -209,47 +168,7 @@ public class PatientGenerator : MonoBehaviour
 
 		return diseaseList;
 	}
-
-
-	private Sprite GetPatienImage(Gender gender, int age)
-	{
-		Sprite image = null;
-
-		if (gender == Gender.Male)
-		{
-			if (age >= 8 && age <= 25)
-			{
-				image = _patient_8_25_M_Image;
-			}
-			else if (age >= 26 && age <= 60)
-			{
-				image = _patient_26_60_M_Image;
-			}
-			else if (age >= 61 && age <= 90)
-			{
-				image = _patient_61_90_M_Image;
-			}
-		}
-		else if (gender == Gender.Female)
-		{
-
-			if (age >= 8 && age <= 25)
-			{
-				image = _patient_8_25_F_Image;
-			}
-			else if (age >= 26 && age <= 60)
-			{
-				image = _patient_26_60_F_Image;
-			}
-			else if (age >= 61 && age <= 90)
-			{
-				image = _patient_61_90_F_Image;
-			}
-		}
-
-		return image;
-	}
-
+	
 	private string GenerateRandomFullName()
 	{
 		string firstNames = _firstNames[Random.Range(0, _firstNames.Count)];
