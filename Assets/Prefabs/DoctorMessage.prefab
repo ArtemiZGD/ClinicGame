@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7020220719329340012}
   - component: {fileID: -5792294584945485022}
+  - component: {fileID: 2390333701039199152}
   m_Layer: 5
   m_Name: DoctorMessage
   m_TagString: Untagged
@@ -51,6 +52,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _messageText: {fileID: 1748550706466807611}
+--- !u!114 &2390333701039199152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7020220719329340013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c998224848c8b8e489ccf7d8b8ece60f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rectTransform: {fileID: 7020220719329340012}
+  _backgroundRectTransform: {fileID: 1748550706528003688}
+  _textMeshPro: {fileID: 1748550706466807611}
 --- !u!1001 &7020220719354046758
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -160,19 +176,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276266219036, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 537.2173
+      value: 533.8543
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276266219036, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 83.0818
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276266219036, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 6.931793
+      value: 6.972809
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276266219036, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -2.4000015
+      value: -0.0000076293945
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276266219037, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_text

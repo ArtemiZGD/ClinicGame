@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 233681527033603525}
   - component: {fileID: 3442010963993725313}
+  - component: {fileID: 5718099577359837518}
   m_Layer: 5
   m_Name: PatientMessage
   m_TagString: Untagged
@@ -51,6 +52,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _messageText: {fileID: 8797491646338891554}
+--- !u!114 &5718099577359837518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233681527033603530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c998224848c8b8e489ccf7d8b8ece60f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rectTransform: {fileID: 233681527033603525}
+  _backgroundRectTransform: {fileID: 8797491646273193585}
+  _textMeshPro: {fileID: 8797491646338891554}
 --- !u!1001 &233681526895135039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58,6 +74,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 233681527033603525}
     m_Modifications:
+    - target: {fileID: 3000989860950221580, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 77.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 3000989860950221580, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -43.305
+      objectReference: {fileID: 0}
     - target: {fileID: 8730452276205014862, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -128,7 +152,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276205014862, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -43.910007
+      value: -45
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276205014862, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -148,11 +172,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276266219036, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 531.8132
+      value: 537.9495
+      objectReference: {fileID: 0}
+    - target: {fileID: 8730452276266219036, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 87.82
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276266219036, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 9.093506
+      value: 6.025299
+      objectReference: {fileID: 0}
+    - target: {fileID: 8730452276266219036, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 8730452276266219037, guid: 6a042b7ae36ed23458d0c36d0dee8013, type: 3}
       propertyPath: m_text

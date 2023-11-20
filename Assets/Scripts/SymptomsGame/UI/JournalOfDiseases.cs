@@ -2,8 +2,6 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using UnityEditor;
-using System.IO;
 
 public class JournalOfDiseases : MonoBehaviour
 {
