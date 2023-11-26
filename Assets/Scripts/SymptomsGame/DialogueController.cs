@@ -17,6 +17,21 @@ public class DialogueController : MonoBehaviour
         AddMessage(message, _doctorMessagePrefab);
     }
 
+    public void ResetMessages()
+    {
+        List<Transform> childs = new();
+
+        foreach (Transform child in _contentParent)
+        {
+            childs.Add(child);
+        }
+
+        for (int i = 0; i < childs.Count; i++)
+        {
+            Destroy(childs[i].gameObject);
+        }
+    }
+
     private void AddMessage(string message, Message messagePrefab)
     {
         Message newMessage = Instantiate(messagePrefab, _contentParent);

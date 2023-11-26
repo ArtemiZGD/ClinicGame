@@ -23,8 +23,9 @@ public class PatientDisplay : MonoBehaviour
 
 	[Header("Text")]
 	[SerializeField] private string _patientSymptomsText;
+	[SerializeField] private string _doctorText;
 
-    public void DisplayPatient(Patient patient)
+	public void DisplayPatient(Patient patient)
 	{
 		string genderRus = "Null";
 		
@@ -43,14 +44,15 @@ public class PatientDisplay : MonoBehaviour
 
 		patient.Sprite = GetPatienImage(patient.Gender, patient.Age);
 		_patientInfoText.text = $"{patient.FullName}, {_currentYear - patient.Age}, {genderRus}";
-
-		AddMessage(patient);
-		
 		_patientIcon.sprite = patient.Sprite;
+
+		AddMessages(patient);
 	}
 
-	private void AddMessage(Patient patient)
+	private void AddMessages(Patient patient)
 	{
+		_dialogueController.ResetMessages();
+		_dialogueController.AddDoctorMessage(_doctorText);
 		_dialogueController.AddPatientMessage(_patientSymptomsText);
 
 		foreach (string symptom in patient.SelectedSymptoms)
