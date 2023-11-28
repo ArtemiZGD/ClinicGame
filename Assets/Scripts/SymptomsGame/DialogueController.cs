@@ -1,40 +1,53 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DialogueController : MonoBehaviour
 {
-    [SerializeField] private Transform _contentParent;
-    [SerializeField] private Message _patientMessagePrefab;
-    [SerializeField] private Message _doctorMessagePrefab;
+	[SerializeField] private ScrollRect _scrollRect;
+	[SerializeField] private Transform _contentParent;
+	[SerializeField] private MessageObject _patientMessagePrefab;
+	[SerializeField] private MessageObject _doctorMessagePrefab;
 
-    public void AddPatientMessage(string message)
-    {
-        AddMessage(message, _patientMessagePrefab);
-    }
+	private MessageObject _prefab;
+	
+	public void ResetMessages()
+	{
+		List<Transform> childs = new();
 
-    public void AddDoctorMessage(string message)
-    {
-        AddMessage(message, _doctorMessagePrefab);
-    }
+		foreach (Transform child in _contentParent)
+		{
+			childs.Add(child);
+		}
 
-    public void ResetMessages()
-    {
-        List<Transform> childs = new();
+		for (int i = 0; i < childs.Count; i++)
+		{
+			Destroy(childs[i].gameObject);
+		}
+	}
 
-        foreach (Transform child in _contentParent)
-        {
-            childs.Add(child);
-        }
+	public void AddMessage(Message message)
+	{
+		if (message.Sender == Sender.Doctor)
+		{
+			_prefab = _doctorMessagePrefab;
+		}
+		else if (message.Sender == Sender.Patient)
+		{
+			_prefab = _patientMessagePrefab;
+		}
 
-        for (int i = 0; i < childs.Count; i++)
-        {
-            Destroy(childs[i].gameObject);
-        }
-    }
+		MessageObject newMessage = Instantiate(_prefab, _contentParent);
+		newMessage.Type(message.Text);
 
-    private void AddMessage(string message, Message messagePrefab)
-    {
-        Message newMessage = Instantiate(messagePrefab, _contentParent);
-        newMessage.Type(message);
-    }
+		StartCoroutine(SetVerticalPositon(0));
+	}
+
+	private IEnumerator SetVerticalPositon(float position)
+	{
+		yield return null;
+
+		_scrollRect.verticalNormalizedPosition = position;
+	}
 }

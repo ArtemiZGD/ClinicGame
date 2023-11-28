@@ -1,12 +1,13 @@
-using TMPro;
-using UnityEngine;
-
-public class Message : MonoBehaviour
+public class Message
 {
-    [SerializeField] private TMP_Text _messageText;
+	public Message(string text, Sender sender, ButtonType buttonType = ButtonType.Null)
+	{
+		Text = text;
+		Sender = sender;
+		ButtonTypeToActive = buttonType;
+	}
 
-    public void Type(string text)
-    {
-        _messageText.text = text;
-    }
+	public string Text;
+	public Sender Sender;
+	public ButtonType ButtonTypeToActive;
 }

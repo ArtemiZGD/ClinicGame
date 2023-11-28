@@ -8,146 +8,192 @@ using Random = UnityEngine.Random;
 
 public class PatientGenerator : MonoBehaviour
 {
-    [Header("Names")]
-    [SerializeField] private List<string> _firstNamesM = new();
-    [SerializeField] private List<string> _firstNamesF = new();
-    [SerializeField] private List<string> _secondNamesM = new();
-    [SerializeField] private List<string> _secondNamesF = new();
+	[Header("Names")]
+	[SerializeField] private List<string> _firstNamesM = new();
+	[SerializeField] private List<string> _firstNamesF = new();
+	[SerializeField] private List<string> _secondNamesM = new();
+	[SerializeField] private List<string> _secondNamesF = new();
 
-    [Header("Age")]
-    [SerializeField] private int _minAge = 8;
-    [SerializeField] private int _maxAge = 90;
+	[Header("Age")]
+	[SerializeField] private int _minAge = 8;
+	[SerializeField] private int _maxAge = 90;
 
-    [Header("Scripts")]
-    [SerializeField] private PatientDisplay _patientDisplay;
-    [SerializeField] private SymptomsGameController _gameController;
+	[Header("Scripts")]
+	[SerializeField] private SymptomsGameController _gameController;
 
-    [Header("UI")]
-    [SerializeField] private List<DiseaseButton> _diseaseButtons = new();
+	public Patient Patient => _patient;
 
-    public Patient Patient => _patient;
+	private List<DiseaseData> _diseases;
+	private List<MedicationData> _medications;
+	private Patient _patient;
 
-    private List<DiseaseData> _diseases;
-    private Patient _patient;
+	public Patient GeneratePatient()
+	{
+		_patient = new Patient();
+		_patient.Gender = (Gender)Random.Range((int)Gender.Male, (int)Gender.Female + 1);
+		_patient.FullName = GenerateRandomFullName(_patient.Gender);
+		_patient.Age = Random.Range(_minAge, _maxAge + 1);
+		_patient.Disease = _diseases[Random.Range(0, _diseases.Count)];
 
-    public void GeneratePatient()
-    {
-        _patient = new Patient();
-        _patient.Gender = (Gender)Random.Range((int)Gender.Male, (int)Gender.Female + 1);
-        _patient.FullName = GenerateRandomFullName(_patient.Gender);
-        _patient.Age = Random.Range(_minAge, _maxAge + 1);
-        _patient.Disease = _diseases[Random.Range(0, _diseases.Count)];
+		_patient.SelectedSymptoms = GetRandomUniqueSymptoms(_patient.Disease, _gameController.DiseaseButtonsCount);
 
-        _patient.SelectedSymptoms = GetRandomUniqueSymptoms(_patient.Disease);
+		SetDiseasesButtons();
+		SetMedicationButtons();
 
-        _patientDisplay.DisplayPatient(_patient);
-        SetDiseasesButtons();
+		return _patient;
+	}
 
-        Debug.Log(_patient.Disease.Name);
-    }
+	private void Awake()
+	{
+		_diseases = LoadDiseaseDataFromFolder("ScriptableObjects/Diseases");
+		_medications = LoadMedicationDataFromFolder("ScriptableObjects/Medications");
+	}
 
-    private void Start()
-    {
-        _diseases = LoadDiseaseDataFromFolder("ScriptableObjects/Diseases");
-        GeneratePatient();
-    }
+	private void SetDiseasesButtons()
+	{
+		List<DiseaseData> freeDiseases = new(_diseases);
+		int diseaseButtonCount = _gameController.DiseaseButtonsCount;
 
-    private void SetDiseasesButtons()
-    {
-        List<DiseaseData> freeDiseases = new(_diseases);
+		int correctButtonNumber = Random.Range(0, diseaseButtonCount);
+		freeDiseases.Remove(_patient.Disease);
 
-        int correctButtonNumber = Random.Range(0, _diseaseButtons.Count);
-        freeDiseases.Remove(_patient.Disease);
+		for (int i = 0; i < diseaseButtonCount; i++)
+		{
+			if (i == correctButtonNumber)
+			{
+				_gameController.InitDisease(i, _patient.Disease);
+			}
+			else
+			{
+				DiseaseData disease = freeDiseases[Random.Range(0, freeDiseases.Count)];
+				freeDiseases.Remove(disease);
+				_gameController.InitDisease(i, disease);
+			}
+		}
 
-        for (int i = 0; i < _diseaseButtons.Count; i++)
-        {
-            if (i == correctButtonNumber)
-            {
-                _diseaseButtons[i].Init(_gameController, _patient.Disease);
-            }
-            else
-            {
-                DiseaseData disease = freeDiseases[Random.Range(0, freeDiseases.Count)];
-                freeDiseases.Remove(disease);
-                _diseaseButtons[i].Init(_gameController, disease);
-            }
-        }
-    }
+		Debug.Log(_patient.Disease.Name);
+	}
 
-    private List<string> GetRandomUniqueSymptoms(DiseaseData disease)
-    {
-        List<SymptomData> allSymptoms = disease.Symptoms.ToList();
-        List<SymptomData> selectedSymptoms = new();
+	private void SetMedicationButtons()
+	{
+		List<MedicationData> correctMedications = new(_patient.Disease.Medications);
+		MedicationData correctMedication = correctMedications[Random.Range(0, correctMedications.Count)];
 
-        int minAttempts = Mathf.Min(_diseaseButtons.Count, allSymptoms.Count);
-        int attempts = 0;
+		List<MedicationData> wrongMedications = new();
 
-        while (GetDiseasesCount(selectedSymptoms) != 1 || attempts < minAttempts)
-        {
-            SymptomData symptomData = allSymptoms[Random.Range(0, allSymptoms.Count)]; //Out of range
-            selectedSymptoms.Add(symptomData);
-            allSymptoms.Remove(symptomData);
+		foreach (MedicationData medication in _medications)
+		{
+			if (correctMedications.Contains(medication) == false)
+			{
+				wrongMedications.Add(medication);
+			}
+		}
 
-            if (GetDiseasesCount(selectedSymptoms) < 1)
-            {
-                Debug.LogError("No matching diseases found");
-            }
+		int medicationButtonsCount = _gameController.MedicationButtonsCount;
+		int correctButtonNumber = Random.Range(0, medicationButtonsCount);
 
-            attempts++;
-        }
+		for (int i = 0; i < medicationButtonsCount; i++)
+		{
+			if (i == correctButtonNumber)
+			{
+				_gameController.InitMedication(i, correctMedication);
+			}
+			else
+			{
+				MedicationData medication = wrongMedications[Random.Range(0, wrongMedications.Count)];
+				wrongMedications.Remove(medication);
+				_gameController.InitMedication(i, medication);
+			}
+		}
 
-        List<string> selectedSymptomNames = new();
+		Debug.Log(correctMedication);
+	}
 
-        foreach (var symptom in selectedSymptoms)
-        {
-            selectedSymptomNames.Add(symptom.Name);
-        }
+	private List<string> GetRandomUniqueSymptoms(DiseaseData disease, int diseaseButtonsCount)
+	{
+		List<SymptomData> allSymptoms = disease.Symptoms.ToList();
+		List<SymptomData> selectedSymptoms = new();
 
-        return selectedSymptomNames;
-    }
+		int minAttempts = Mathf.Min(diseaseButtonsCount, allSymptoms.Count);
+		int attempts = 0;
 
-    private int GetDiseasesCount(List<SymptomData> selectedSymptoms)
-    {
-        int diseasesCount = 0;
+		while (GetDiseasesCount(selectedSymptoms) != 1 || attempts < minAttempts)
+		{
+			SymptomData symptomData = allSymptoms[Random.Range(0, allSymptoms.Count)]; //Out of range
+			selectedSymptoms.Add(symptomData);
+			allSymptoms.Remove(symptomData);
 
-        foreach (DiseaseData disease in _diseases)
-        {
-            if (selectedSymptoms.All(symptom => disease.Symptoms.Contains(symptom)))
-            {
-                diseasesCount++;
-            }
-        }
+			if (GetDiseasesCount(selectedSymptoms) < 1)
+			{
+				Debug.LogError("No matching diseases found");
+			}
 
-        return diseasesCount;
-    }
+			attempts++;
+		}
 
-    private List<DiseaseData> LoadDiseaseDataFromFolder(string folderPath)
-    {
-        List<DiseaseData> diseaseList = new();
+		List<string> selectedSymptomNames = new();
 
-        DiseaseData[] diseaseDataArray = Resources.LoadAll<DiseaseData>(folderPath);
+		foreach (var symptom in selectedSymptoms)
+		{
+			selectedSymptomNames.Add(symptom.Name);
+		}
 
-        diseaseList.AddRange(diseaseDataArray);
+		return selectedSymptomNames;
+	}
 
-        return diseaseList;
-    }
+	private int GetDiseasesCount(List<SymptomData> selectedSymptoms)
+	{
+		int diseasesCount = 0;
 
-    private string GenerateRandomFullName(Gender gender)
-    {
-        string firstNames;
-        string secondNames;
+		foreach (DiseaseData disease in _diseases)
+		{
+			if (selectedSymptoms.All(symptom => disease.Symptoms.Contains(symptom)))
+			{
+				diseasesCount++;
+			}
+		}
 
-        if (gender == Gender.Male)
-        {
-            firstNames = _firstNamesM[Random.Range(0, _firstNamesM.Count)];
-            secondNames = _secondNamesM[Random.Range(0, _secondNamesM.Count)];
-        }
-        else
-        {
-            firstNames = _firstNamesF[Random.Range(0, _firstNamesF.Count)];
-            secondNames = _secondNamesF[Random.Range(0, _secondNamesF.Count)];
-        }
+		return diseasesCount;
+	}
 
-        return secondNames + " " + firstNames;
-    }
+	private List<DiseaseData> LoadDiseaseDataFromFolder(string folderPath)
+	{
+		List<DiseaseData> diseases = new();
+
+		DiseaseData[] diseaseDataArray = Resources.LoadAll<DiseaseData>(folderPath);
+
+		diseases.AddRange(diseaseDataArray);
+
+		return diseases;
+	}
+
+	private List<MedicationData> LoadMedicationDataFromFolder(string folderPath)
+	{
+		List<MedicationData> medications = new();
+
+		MedicationData[] medicationDataArray = Resources.LoadAll<MedicationData>(folderPath);
+
+		medications.AddRange(medicationDataArray);
+
+		return medications;
+	}
+
+	private string GenerateRandomFullName(Gender gender)
+	{
+		string firstNames;
+		string secondNames;
+
+		if (gender == Gender.Male)
+		{
+			firstNames = _firstNamesM[Random.Range(0, _firstNamesM.Count)];
+			secondNames = _secondNamesM[Random.Range(0, _secondNamesM.Count)];
+		}
+		else
+		{
+			firstNames = _firstNamesF[Random.Range(0, _firstNamesF.Count)];
+			secondNames = _secondNamesF[Random.Range(0, _secondNamesF.Count)];
+		}
+
+		return secondNames + " " + firstNames;
+	}
 }

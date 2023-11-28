@@ -16,14 +16,9 @@ public class PatientDisplay : MonoBehaviour
 	[Header("UI")]
 	[SerializeField] private Image _patientIcon;
 	[SerializeField] private TMP_Text _patientInfoText;
-	[SerializeField] private DialogueController _dialogueController;
 
 	[Header("Year")]
 	[SerializeField] private int _currentYear = 2023;
-
-	[Header("Text")]
-	[SerializeField] private string _patientSymptomsText;
-	[SerializeField] private string _doctorText;
 
 	public void DisplayPatient(Patient patient)
 	{
@@ -45,20 +40,6 @@ public class PatientDisplay : MonoBehaviour
 		patient.Sprite = GetPatienImage(patient.Gender, patient.Age);
 		_patientInfoText.text = $"{patient.FullName}, {_currentYear - patient.Age}, {genderRus}";
 		_patientIcon.sprite = patient.Sprite;
-
-		AddMessages(patient);
-	}
-
-	private void AddMessages(Patient patient)
-	{
-		_dialogueController.ResetMessages();
-		_dialogueController.AddDoctorMessage(_doctorText);
-		_dialogueController.AddPatientMessage(_patientSymptomsText);
-
-		foreach (string symptom in patient.SelectedSymptoms)
-		{
-			_dialogueController.AddPatientMessage(symptom);
-		}
 	}
 
 	private Sprite GetPatienImage(Gender gender, int age)
