@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,68 +11,57 @@ public class SymptomsGameController : MonoBehaviour
 	[Header("UI")]
 	[SerializeField] private ScreenSwitcher _screenSwitcher;
 	[SerializeField] private GameObject _gameOverMenu;
+	[SerializeField] private TMP_Text _symptomsText;
+	[SerializeField] private string _symptomsTextBeginning;
+	[SerializeField] private char _symptomsTextSeparator = '-';
+	[SerializeField] private TMP_Text _diagnosisText;
+	[SerializeField] private TMP_Text _medicationText;
 
 	[Header("Buttons")]
-	[SerializeField] private GreetingButton _greetingButton;
 	[SerializeField] private List<DiseaseButton> _diseaseButtons;
-	[SerializeField] private Button _reloadButton;
+	[SerializeField] private WrongDiseaseController _reloadDiagnosisButton;
+	[SerializeField] private WrongMedicationController _reloadMedicationButton;
 	[SerializeField] private List<MedicationButton> _medicationButtons;
-	[SerializeField] private Button _congratulationsButton;
-
-	[Header("Dialogue")]
-	[SerializeField] private DialogueTextData _dialogueText;
-	[SerializeField] private float _messagesDelay = 0.5f;
 
 	public int DiseaseButtonsCount => _diseaseButtons.Count;
 	public int MedicationButtonsCount => _medicationButtons.Count;
+	public int Score => _score;
 
 	private PatientGenerator _patientGenerator;
 	private DialogueController _dialogueController;
 	private PatientDisplay _patientDisplay;
 
-	private List<Message> _messages = new();
-	private WaitForSeconds _waitForSeconds;
 	private Patient _patient;
+
+	private int _score;
 
 	public void CheckDiseaseAnswer(DiseaseData disease)
 	{
-		AddDoctorMessage(disease.Name);
-
-		if (disease.Name == _patientGenerator.Patient.Disease.Name)
+		if (disease.Name == _patient.Disease.Name)
 		{
-			AddPatientMessage(_dialogueText.PatientAskMed, ButtonType.Medication);
+			_diagnosisText.text = disease.Name;
+			SetActiveButtons(ButtonType.Medication);
 		}
 		else
 		{
-			TakeDamage();
+			TakeDamage(ButtonType.ReloadDiagnosis);
+			_reloadDiagnosisButton.SetTexts(disease, _patient.Disease);
 		}
 	}
 
 	public void CheckMedicationAnswer(MedicationData medication)
 	{
-		AddDoctorMessage(medication.Name);
-
 		if (_patientGenerator.Patient.IsMedicationFit(medication))
 		{
-			AddPatientMessage(_dialogueText.PatientThanks, ButtonType.Congratulations);
+			_medicationText.text = medication.Name;
+			_score++;
+			GenerateNewPatient();
 		}
 		else
 		{
-			TakeDamage();
+			TakeDamage(ButtonType.ReloadMedication);
+			_reloadMedicationButton.SetTexts(medication, _patient.Disease);
 		}
-	}
-
-	public void AddGreetingMessages()
-	{
-		AddDoctorMessage(_dialogueText.DoctorGreeting);
-		AddPatientMessage(_dialogueText.PatientGreeting);
-
-		foreach (string symptom in _patient.SelectedSymptoms)
-		{
-			AddPatientMessage(symptom);
-		}
-
-		AddButtonTypeToLastMessage(ButtonType.Disease);
 	}
 
 	public void GenerateNewPatient()
@@ -80,8 +69,9 @@ public class SymptomsGameController : MonoBehaviour
 		_patient = _patientGenerator.GeneratePatient();
 		_patientDisplay.DisplayPatient(_patient);
 		_dialogueController.ResetMessages();
-		_messages.Clear();
-		SetActiveButtons(ButtonType.Greeting);
+		SetActiveButtons(ButtonType.Disease);
+		DisplaySymptoms();
+		ClearTexts();
 	}
 
 	public void InitDisease(int index, DiseaseData disease)
@@ -94,94 +84,67 @@ public class SymptomsGameController : MonoBehaviour
 		_medicationButtons[index].Init(this, medication);
 	}
 
-	private void TakeDamage()
-	{
-		_heartsController.TakeDamage();
-
-		if (_heartsController.IsAlive == false)
-		{
-			GenerateNewPatient();
-			_heartsController.ResetHearts();
-			_screenSwitcher.SwitchScreen(_gameOverMenu);
-		}
-		else
-		{
-			SetActiveButtons(ButtonType.Reload);
-		}
-	}
-
-	private void AddDoctorMessage(string text, ButtonType buttonType = ButtonType.Null)
-	{
-		_messages.Add(new Message(text, Sender.Doctor, buttonType));
-	}
-
-	private void AddPatientMessage(string text, ButtonType buttonType = ButtonType.Null)
-	{
-		_messages.Add(new Message(text, Sender.Patient, buttonType));
-	}
-
-	private void AddButtonTypeToLastMessage(ButtonType buttonType)
-	{
-		_messages[_messages.Count - 1].ButtonTypeToActive = buttonType;
-	}
-
 	private void Awake()
 	{
 		_patientDisplay = GetComponent<PatientDisplay>();
 		_dialogueController = GetComponent<DialogueController>();
 		_patientGenerator = GetComponent<PatientGenerator>();
-
-		_waitForSeconds = new WaitForSeconds(_messagesDelay);
 	}
 
 	private void Start()
 	{
+		_score = 0;
 		GenerateNewPatient();
 	}
 
-	private void OnEnable()
+	private void DisplaySymptoms()
 	{
-		StartCoroutine(AddMessagesCoroutine(_messages));
+		_symptomsText.text = "";
+		_symptomsText.text += _symptomsTextBeginning;
+
+		foreach (string symptom in _patient.SelectedSymptoms)
+		{
+			_symptomsText.text += "\n";
+			_symptomsText.text += _symptomsTextSeparator;
+			_symptomsText.text += symptom;
+		}
+	}
+
+	public void ClearTexts()
+	{
+		_diagnosisText.text = "";
+		_medicationText.text = "";
+	}
+
+	private void TakeDamage(ButtonType buttonType)
+	{
+		_heartsController.TakeDamage();
+
+		if (_heartsController.IsAlive == false)
+		{
+			_heartsController.ResetHearts();
+			_screenSwitcher.SwitchScreen(_gameOverMenu);
+			_score = 0;
+		}
+		else
+		{
+			SetActiveButtons(buttonType);
+		}
 	}
 
 	private void SetActiveButtons(ButtonType buttonType)
 	{
-		_greetingButton.gameObject.SetActive(buttonType == ButtonType.Greeting);
-
 		foreach (DiseaseButton button in _diseaseButtons)
 		{
 			button.gameObject.SetActive(buttonType == ButtonType.Disease);
 		}
-
-		_reloadButton.gameObject.SetActive(buttonType == ButtonType.Reload);
 
 		foreach (MedicationButton button in _medicationButtons)
 		{
 			button.gameObject.SetActive(buttonType == ButtonType.Medication);
 		}
 
-		_congratulationsButton.gameObject.SetActive(buttonType == ButtonType.Congratulations);
-	}
-
-	private IEnumerator AddMessagesCoroutine(List<Message> messages)
-	{
-		while (true)
-		{
-			if (messages.Count > 0)
-			{
-				_dialogueController.AddMessage(messages[0]);
-
-				if (messages[0].ButtonTypeToActive != ButtonType.Null)
-				{
-					SetActiveButtons(messages[0].ButtonTypeToActive);
-				}
-
-				messages.RemoveAt(0);
-
-				yield return _waitForSeconds;
-			}
-
-			yield return null;
-		}
+		_reloadDiagnosisButton.gameObject.SetActive(buttonType == ButtonType.ReloadDiagnosis);
+		_reloadMedicationButton.gameObject.SetActive(buttonType == ButtonType.ReloadMedication);
 	}
 }

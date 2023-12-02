@@ -1,9 +1,8 @@
 public enum ButtonType
 {
 	Null,
-	Greeting,
 	Disease,
-	Reload,
-	Medication,
-	Congratulations
+	ReloadDiagnosis,
+	ReloadMedication,
+	Medication
 }

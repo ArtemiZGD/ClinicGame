@@ -7,9 +7,13 @@ public class JournalOfDiseases : MonoBehaviour
 {
 	[SerializeField] private Button _previousButton;
 	[SerializeField] private Button _nextButton;
-	[SerializeField] private TMP_Text _diseaseNameText;
+	[SerializeField] private MessageObject _diseaseMessage;
 	[SerializeField] private TMP_Text _symptomsText;
 	[SerializeField] private TMP_Text _medicationsText;
+	[TextArea]
+	[SerializeField] private string _symptomsTextUI = "Симптомы:";
+	[TextArea]
+	[SerializeField] private string _medicationsTextUI = "Лечение:";
 
 	private List<DiseaseData> _diseases;
 	private int _currentDiseaseIndex;
@@ -60,15 +64,15 @@ public class JournalOfDiseases : MonoBehaviour
 	private void UpdateUI()
 	{
 		DiseaseData currentDisease = _diseases[_currentDiseaseIndex];
-		_diseaseNameText.text = currentDisease.Name + $" ({_currentDiseaseIndex + 1})";
+		_diseaseMessage.Type(currentDisease.Name + $" ({_currentDiseaseIndex + 1})");
 
-		_symptomsText.text = "Симптомы:";
+		_symptomsText.text = _symptomsTextUI;
 		foreach (var symptom in currentDisease.Symptoms)
 		{
 			_symptomsText.text += "\n-" + symptom.Name;
 		}
 
-		_medicationsText.text = "Лекарства:";
+		_medicationsText.text = _medicationsTextUI;
 		foreach (var medication in currentDisease.Medications)
 		{
 			_medicationsText.text += "\n-" + medication.Name;
