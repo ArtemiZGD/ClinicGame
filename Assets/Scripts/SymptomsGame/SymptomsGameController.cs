@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-[RequireComponent(typeof(PatientDisplay)), RequireComponent(typeof(DialogueController)), RequireComponent(typeof(PatientGenerator))]
+[RequireComponent(typeof(PatientDisplay)), RequireComponent(typeof(PatientGenerator))]
 public class SymptomsGameController : MonoBehaviour
 {
 	[SerializeField] private HeartsController _heartsController;
@@ -28,7 +27,6 @@ public class SymptomsGameController : MonoBehaviour
 	public int Score => _score;
 
 	private PatientGenerator _patientGenerator;
-	private DialogueController _dialogueController;
 	private PatientDisplay _patientDisplay;
 
 	private Patient _patient;
@@ -68,7 +66,6 @@ public class SymptomsGameController : MonoBehaviour
 	{
 		_patient = _patientGenerator.GeneratePatient();
 		_patientDisplay.DisplayPatient(_patient);
-		_dialogueController.ResetMessages();
 		SetActiveButtons(ButtonType.Disease);
 		DisplaySymptoms();
 		ClearTexts();
@@ -87,7 +84,6 @@ public class SymptomsGameController : MonoBehaviour
 	private void Awake()
 	{
 		_patientDisplay = GetComponent<PatientDisplay>();
-		_dialogueController = GetComponent<DialogueController>();
 		_patientGenerator = GetComponent<PatientGenerator>();
 	}
 

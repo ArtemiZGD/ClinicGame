@@ -38,7 +38,7 @@ public class PatientDisplay : MonoBehaviour
 		}
 
 		patient.Sprite = GetPatienImage(patient.Gender, patient.Age);
-		_patientInfoText.text = $"ФИО: {patient.FullName}\n Год рождения: {_currentYear - patient.Age}\n Пол: {genderRus}";
+		_patientInfoText.text = $"ФИО: {patient.FullName}\nГод рождения: {_currentYear - patient.Age}\nПол: {genderRus}";
 		_patientIcon.sprite = patient.Sprite;
 	}
 
