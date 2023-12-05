@@ -6,10 +6,12 @@ using UnityEngine;
 public class SymptomsGameController : MonoBehaviour
 {
 	[SerializeField] private HeartsController _heartsController;
+	[SerializeField] private int _maxScore = 5;
 
 	[Header("UI")]
 	[SerializeField] private ScreenSwitcher _screenSwitcher;
 	[SerializeField] private GameObject _gameOverMenu;
+	[SerializeField] private GameObject _victoryMenu;
 	[SerializeField] private TMP_Text _symptomsText;
 	[SerializeField] private string _symptomsTextBeginning;
 	[SerializeField] private char _symptomsTextSeparator = '-';
@@ -25,6 +27,7 @@ public class SymptomsGameController : MonoBehaviour
 	public int DiseaseButtonsCount => _diseaseButtons.Count;
 	public int MedicationButtonsCount => _medicationButtons.Count;
 	public int Score => _score;
+	public int MaxScore => _maxScore;
 
 	private PatientGenerator _patientGenerator;
 	private PatientDisplay _patientDisplay;
@@ -53,7 +56,17 @@ public class SymptomsGameController : MonoBehaviour
 		{
 			_medicationText.text = medication.Name;
 			_score++;
-			GenerateNewPatient();
+
+			if (_score == _maxScore)
+			{
+				_heartsController.ResetHearts();
+				_screenSwitcher.SwitchScreen(_victoryMenu);
+				_score = 0;
+			}
+			else
+			{
+				GenerateNewPatient();
+			}
 		}
 		else
 		{

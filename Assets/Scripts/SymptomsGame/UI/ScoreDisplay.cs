@@ -9,6 +9,6 @@ public class ScoreDisplay : MonoBehaviour
 
 	private void OnEnable()
 	{
-		_scoreText.text = _beginningText + _gameController.Score;
+		_scoreText.text = _beginningText + _gameController.Score + "/" + _gameController.MaxScore;
 	}
 }
