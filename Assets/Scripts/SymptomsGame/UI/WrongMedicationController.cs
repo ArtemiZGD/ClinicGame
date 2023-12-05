@@ -11,13 +11,13 @@ public class WrongMedicationController : MonoBehaviour
 	[SerializeField] private string _rightTextExample;
 	[SerializeField] private char _highlight = '*';
 
-	public void SetTexts(MedicationData wrongMedication, DiseaseData rightDisease)
+	public void SetTexts(DiseaseData rightDisease)
 	{
-		_wrongText.text = EditText(_wrongTextExample, wrongMedication);
+		_wrongText.text = EditTextWrongMed(_wrongTextExample, rightDisease);
 		_rightText.text = EditText(_rightTextExample, rightDisease);
 	}
 
-	private string EditText(string text, MedicationData wrongMedication)
+	private string EditTextWrongMed(string text, DiseaseData rightDisease)
 	{
 		string newText = "";
 
@@ -28,7 +28,7 @@ public class WrongMedicationController : MonoBehaviour
 			Debug.LogError("Wrong text");
 		}
 
-		newText += stringParts[0] + wrongMedication.Name + stringParts[1] + "\n";
+		newText += stringParts[0] + rightDisease.Name + stringParts[1] + "\n";
 
 		return newText;
 	}

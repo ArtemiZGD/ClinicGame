@@ -71,7 +71,7 @@ public class SymptomsGameController : MonoBehaviour
 		else
 		{
 			TakeDamage(ButtonType.ReloadMedication);
-			_reloadMedicationButton.SetTexts(medication, _patient.Disease);
+			_reloadMedicationButton.SetTexts(_patient.Disease);
 		}
 	}
 
