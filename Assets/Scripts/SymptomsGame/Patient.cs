@@ -10,4 +10,17 @@ public class Patient
 	public Sprite Sprite;
 	public DiseaseData Disease;
 	public List<string> SelectedSymptoms = new();
+
+	public bool IsMedicationFit(MedicationData medication)
+	{
+		foreach (MedicationData correctMedication in Disease.Medications)
+		{
+			if (correctMedication.Name == medication.Name)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

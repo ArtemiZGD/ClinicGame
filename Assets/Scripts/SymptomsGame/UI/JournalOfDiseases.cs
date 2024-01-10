@@ -2,14 +2,12 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using UnityEditor;
-using System.IO;
 
 public class JournalOfDiseases : MonoBehaviour
 {
 	[SerializeField] private Button _previousButton;
 	[SerializeField] private Button _nextButton;
-	[SerializeField] private TMP_Text _diseaseNameText;
+	[SerializeField] private MessageObject _diseaseMessage;
 	[SerializeField] private TMP_Text _symptomsText;
 	[SerializeField] private TMP_Text _medicationsText;
 
@@ -62,15 +60,16 @@ public class JournalOfDiseases : MonoBehaviour
 	private void UpdateUI()
 	{
 		DiseaseData currentDisease = _diseases[_currentDiseaseIndex];
-		_diseaseNameText.text = currentDisease.Name + $" ({_currentDiseaseIndex + 1})";
+		_diseaseMessage.Type(currentDisease.Name);
 
-		_symptomsText.text = "Симптомы:";
+		_symptomsText.text = "";
+		_medicationsText.text = "";
+
 		foreach (var symptom in currentDisease.Symptoms)
 		{
 			_symptomsText.text += "\n-" + symptom.Name;
 		}
 
-		_medicationsText.text = "Лекарства:";
 		foreach (var medication in currentDisease.Medications)
 		{
 			_medicationsText.text += "\n-" + medication.Name;
