@@ -3,9 +3,19 @@ using UnityEngine;
 
 public class ScreenSwitcher : MonoBehaviour
 {
-	[SerializeField] private GameObject _startScreen;
+	[SerializeField] private GameObject _startMenu;
 
-	private readonly List<GameObject> _objectsToHide = new();
+	private List<GameObject> _objectsToHide = new();
+
+	public void SwitchObjects(GameObject objectToActivate)
+	{
+		foreach (var obj in _objectsToHide)
+		{
+			obj.SetActive(false);
+		}
+
+		objectToActivate.SetActive(true);
+	}
 
 	private void Start()
 	{
@@ -14,16 +24,6 @@ public class ScreenSwitcher : MonoBehaviour
 			_objectsToHide.Add(obj.gameObject);
 		}
 
-		SwitchScreen(_startScreen);
-	}
-
-	public void SwitchScreen(GameObject objectToActivate)
-	{
-		foreach (var obj in _objectsToHide)
-		{
-			obj.SetActive(false);
-		}
-
-		objectToActivate.SetActive(true);
+		SwitchObjects(_startMenu);
 	}
 }
