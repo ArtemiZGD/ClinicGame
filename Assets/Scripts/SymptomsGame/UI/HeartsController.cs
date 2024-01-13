@@ -3,37 +3,40 @@ using UnityEngine;
 
 public class HeartsController : MonoBehaviour
 {
-    [SerializeField] private List<Heart> _hearts;
+	[SerializeField] private List<Heart> _hearts;  // Список объектов "Сердце"
 
-    public bool IsAlive => _hp > 0;
+	public bool IsAlive => _hp > 0;  // Проверка, жив ли игрок
 
-    private int _hp;
+	private int _hp;  // Количество жизней
 
-    public void TakeDamage()
-    {
-        if (_hp > 0)
-        {
-            _hp--;
-            _hearts[_hp].SetActive(false);
-        }
-        else
-        {
-            Debug.LogError("_hp < 0");
-        }
-    }
+	// Получение урона
+	public void TakeDamage()
+	{
+		if (_hp > 0)
+		{
+			_hp--;
+			_hearts[_hp].SetActive(false);  // Деактивация соответствующего сердца
+		}
+		else
+		{
+			Debug.LogError("_hp < 0");  // Вывод ошибки, если жизней уже нет
+		}
+	}
 
-    public void ResetHearts()
-    {
-        _hp = _hearts.Count;
+	// Сброс количества жизней и активация всех сердец
+	public void ResetHearts()
+	{
+		_hp = _hearts.Count;
 
-        foreach (var heart in _hearts)
-        {
-            heart.SetActive(true);
-        }
-    }
+		foreach (var heart in _hearts)
+		{
+			heart.SetActive(true);
+		}
+	}
 
-    private void Start()
-    {
-        ResetHearts();
-    }
+	// Вызывается при старте объекта
+	private void Start()
+	{
+		ResetHearts();  // Инициализация сердец при старте
+	}
 }

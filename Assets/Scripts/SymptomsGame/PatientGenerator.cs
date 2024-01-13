@@ -6,27 +6,29 @@ using UnityEngine;
 using UnityEngine.Analytics;
 using Random = UnityEngine.Random;
 
+// Класс для генерации информации о пациенте
 public class PatientGenerator : MonoBehaviour
 {
 	[Header("Names")]
-	[SerializeField] private List<string> _firstNamesM = new();
-	[SerializeField] private List<string> _firstNamesF = new();
-	[SerializeField] private List<string> _secondNamesM = new();
-	[SerializeField] private List<string> _secondNamesF = new();
+	[SerializeField] private List<string> _firstNamesM = new List<string>();  // Список мужских имен
+	[SerializeField] private List<string> _firstNamesF = new List<string>();  // Список женских имен
+	[SerializeField] private List<string> _secondNamesM = new List<string>();  // Список мужских фамилий
+	[SerializeField] private List<string> _secondNamesF = new List<string>();  // Список женских фамилий
 
 	[Header("Age")]
-	[SerializeField] private int _minAge = 8;
-	[SerializeField] private int _maxAge = 90;
+	[SerializeField] private int _minAge = 8;  // Минимальный возраст пациента
+	[SerializeField] private int _maxAge = 90;  // Максимальный возраст пациента
 
 	[Header("Scripts")]
-	[SerializeField] private SymptomsGameController _gameController;
+	[SerializeField] private SymptomsGameController _gameController;  // Контроллер игры с симптомами
 
-	public Patient Patient => _patient;
+	public Patient Patient => _patient;  // Информация о текущем пациенте
 
-	private List<DiseaseData> _diseases;
-	private List<MedicationData> _medications;
-	private Patient _patient;
+	private List<DiseaseData> _diseases;  // Список данных о заболеваниях
+	private List<MedicationData> _medications;  // Список данных о лекарствах
+	private Patient _patient;  // Текущий пациент
 
+	// Генерация информации о пациенте
 	public Patient GeneratePatient()
 	{
 		_patient = new Patient();
@@ -43,15 +45,17 @@ public class PatientGenerator : MonoBehaviour
 		return _patient;
 	}
 
+	// Загрузка данных о заболеваниях при запуске
 	private void Awake()
 	{
 		_diseases = LoadDiseaseDataFromFolder("ScriptableObjects/Diseases");
 		_medications = LoadMedicationDataFromFolder("ScriptableObjects/Medications");
 	}
 
+	// Установка кнопок с заболеваниями
 	private void SetDiseasesButtons()
 	{
-		List<DiseaseData> freeDiseases = new(_diseases);
+		List<DiseaseData> freeDiseases = new List<DiseaseData>(_diseases);
 		int diseaseButtonCount = _gameController.DiseaseButtonsCount;
 
 		int correctButtonNumber = Random.Range(0, diseaseButtonCount);
@@ -74,16 +78,17 @@ public class PatientGenerator : MonoBehaviour
 		Debug.Log(_patient.Disease.Name);
 	}
 
+	// Установка кнопок с лекарствами
 	private void SetMedicationButtons()
 	{
-		List<MedicationData> correctMedications = new(_patient.Disease.Medications);
+		List<MedicationData> correctMedications = new List<MedicationData>(_patient.Disease.Medications);
 		MedicationData correctMedication = correctMedications[Random.Range(0, correctMedications.Count)];
 
-		List<MedicationData> wrongMedications = new();
+		List<MedicationData> wrongMedications = new List<MedicationData>();
 
 		foreach (MedicationData medication in _medications)
 		{
-			if (correctMedications.Contains(medication) == false)
+			if (!correctMedications.Contains(medication))
 			{
 				wrongMedications.Add(medication);
 			}
@@ -109,10 +114,11 @@ public class PatientGenerator : MonoBehaviour
 		Debug.Log(correctMedication);
 	}
 
+	// Получение случайных уникальных симптомов
 	private List<string> GetRandomUniqueSymptoms(DiseaseData disease, int diseaseButtonsCount)
 	{
 		List<SymptomData> allSymptoms = disease.Symptoms.ToList();
-		List<SymptomData> selectedSymptoms = new();
+		List<SymptomData> selectedSymptoms = new List<SymptomData>();
 
 		int minAttempts = Mathf.Min(diseaseButtonsCount, allSymptoms.Count);
 		int attempts = 0;
@@ -131,7 +137,7 @@ public class PatientGenerator : MonoBehaviour
 			attempts++;
 		}
 
-		List<string> selectedSymptomNames = new();
+		List<string> selectedSymptomNames = new List<string>();
 
 		foreach (var symptom in selectedSymptoms)
 		{
@@ -141,6 +147,7 @@ public class PatientGenerator : MonoBehaviour
 		return selectedSymptomNames;
 	}
 
+	// Получение количества совпадающих заболеваний по симптомам
 	private int GetDiseasesCount(List<SymptomData> selectedSymptoms)
 	{
 		int diseasesCount = 0;
@@ -156,9 +163,10 @@ public class PatientGenerator : MonoBehaviour
 		return diseasesCount;
 	}
 
+	// Загрузка данных о заболеваниях из указанной папки
 	private List<DiseaseData> LoadDiseaseDataFromFolder(string folderPath)
 	{
-		List<DiseaseData> diseases = new();
+		List<DiseaseData> diseases = new List<DiseaseData>();
 
 		DiseaseData[] diseaseDataArray = Resources.LoadAll<DiseaseData>(folderPath);
 
@@ -167,9 +175,10 @@ public class PatientGenerator : MonoBehaviour
 		return diseases;
 	}
 
+	// Загрузка данных о лекарствах из указанной папки
 	private List<MedicationData> LoadMedicationDataFromFolder(string folderPath)
 	{
-		List<MedicationData> medications = new();
+		List<MedicationData> medications = new List<MedicationData>();
 
 		MedicationData[] medicationDataArray = Resources.LoadAll<MedicationData>(folderPath);
 
@@ -178,6 +187,7 @@ public class PatientGenerator : MonoBehaviour
 		return medications;
 	}
 
+	// Генерация случайного полного имени в зависимости от пола
 	private string GenerateRandomFullName(Gender gender)
 	{
 		string firstNames;

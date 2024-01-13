@@ -5,28 +5,30 @@ using UnityEngine.UI;
 
 public class DialogueController : MonoBehaviour
 {
-	[SerializeField] private ScrollRect _scrollRect;
-	[SerializeField] private Transform _contentParent;
-	[SerializeField] private MessageObject _patientMessagePrefab;
-	[SerializeField] private MessageObject _doctorMessagePrefab;
+	[SerializeField] private ScrollRect _scrollRect;  // Объект для прокрутки сообщений
+	[SerializeField] private Transform _contentParent;  // Родительский объект для отображения сообщений
+	[SerializeField] private MessageObject _patientMessagePrefab;  // Префаб сообщения от пациента
+	[SerializeField] private MessageObject _doctorMessagePrefab;  // Префаб сообщения от доктора
 
-	private MessageObject _prefab;
-	
+	private MessageObject _prefab;  // Используемый префаб сообщения
+
+	// Сброс всех сообщений
 	public void ResetMessages()
 	{
-		List<Transform> childs = new();
+		List<Transform> children = new List<Transform>();
 
 		foreach (Transform child in _contentParent)
 		{
-			childs.Add(child);
+			children.Add(child);
 		}
 
-		for (int i = 0; i < childs.Count; i++)
+		for (int i = 0; i < children.Count; i++)
 		{
-			Destroy(childs[i].gameObject);
+			Destroy(children[i].gameObject);
 		}
 	}
 
+	// Добавление нового сообщения
 	public void AddMessage(Message message)
 	{
 		if (message.Sender == Sender.Doctor)
@@ -41,10 +43,11 @@ public class DialogueController : MonoBehaviour
 		MessageObject newMessage = Instantiate(_prefab, _contentParent);
 		newMessage.Type(message.Text);
 
-		StartCoroutine(SetVerticalPositon(0));
+		StartCoroutine(SetVerticalPosition(0));
 	}
 
-	private IEnumerator SetVerticalPositon(float position)
+	// Установка вертикальной позиции прокрутки
+	private IEnumerator SetVerticalPosition(float position)
 	{
 		yield return null;
 

@@ -6,5 +6,4 @@ using UnityEngine;
 public class FirstAidData : ScriptableObject
 {
 	public string Name;
-
 }

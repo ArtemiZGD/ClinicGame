@@ -5,37 +5,38 @@ using UnityEngine;
 [RequireComponent(typeof(PatientDisplay)), RequireComponent(typeof(PatientGenerator))]
 public class SymptomsGameController : MonoBehaviour
 {
-	[SerializeField] private HeartsController _heartsController;
-	[SerializeField] private int _maxScore = 5;
+	[SerializeField] private HeartsController _heartsController;  // Контроллер жизней
+	[SerializeField] private int _maxScore = 5;  // Максимальное количество очков
 
 	[Header("UI")]
-	[SerializeField] private ScreenSwitcher _screenSwitcher;
-	[SerializeField] private GameObject _gameOverMenu;
-	[SerializeField] private GameObject _victoryMenu;
-	[SerializeField] private TMP_Text _symptomsText;
-	[SerializeField] private string _symptomsTextBeginning;
-	[SerializeField] private char _symptomsTextSeparator = '-';
-	[SerializeField] private TMP_Text _diagnosisText;
-	[SerializeField] private TMP_Text _medicationText;
+	[SerializeField] private ScreenSwitcher _screenSwitcher;  // Переключатель экранов
+	[SerializeField] private GameObject _gameOverMenu;  // Меню окончания игры
+	[SerializeField] private GameObject _victoryMenu;  // Меню победы
+	[SerializeField] private TMP_Text _symptomsText;  // Текст с симптомами
+	[SerializeField] private string _symptomsTextBeginning;  // Начальный текст симптомов
+	[SerializeField] private char _symptomsTextSeparator = '-';  // Разделитель симптомов
+	[SerializeField] private TMP_Text _diagnosisText;  // Текст с диагнозом
+	[SerializeField] private TMP_Text _medicationText;  // Текст с лекарством
 
 	[Header("Buttons")]
-	[SerializeField] private List<DiseaseButton> _diseaseButtons;
-	[SerializeField] private WrongDiseaseController _reloadDiagnosisButton;
-	[SerializeField] private WrongMedicationController _reloadMedicationButton;
-	[SerializeField] private List<MedicationButton> _medicationButtons;
+	[SerializeField] private List<DiseaseButton> _diseaseButtons;  // Кнопки с заболеваниями
+	[SerializeField] private WrongDiseaseController _reloadDiagnosisButton;  // Кнопка перезагрузки диагноза
+	[SerializeField] private WrongMedicationController _reloadMedicationButton;  // Кнопка перезагрузки лекарства
+	[SerializeField] private List<MedicationButton> _medicationButtons;  // Кнопки с лекарствами
 
-	public int DiseaseButtonsCount => _diseaseButtons.Count;
-	public int MedicationButtonsCount => _medicationButtons.Count;
-	public int Score => _score;
-	public int MaxScore => _maxScore;
+	public int DiseaseButtonsCount => _diseaseButtons.Count;  // Количество кнопок с заболеваниями
+	public int MedicationButtonsCount => _medicationButtons.Count;  // Количество кнопок с лекарствами
+	public int Score => _score;  // Количество очков
+	public int MaxScore => _maxScore;  // Максимальное количество очков
 
-	private PatientGenerator _patientGenerator;
-	private PatientDisplay _patientDisplay;
+	private PatientGenerator _patientGenerator;  // Генератор пациентов
+	private PatientDisplay _patientDisplay;  // Отображение информации о пациенте
 
-	private Patient _patient;
+	private Patient _patient;  // Текущий пациент
 
-	private int _score;
+	private int _score;  // Очки игрока
 
+	// Проверка ответа по заболеванию
 	public void CheckDiseaseAnswer(DiseaseData disease)
 	{
 		if (disease.Name == _patient.Disease.Name)
@@ -50,6 +51,7 @@ public class SymptomsGameController : MonoBehaviour
 		}
 	}
 
+	// Проверка ответа по лекарству
 	public void CheckMedicationAnswer(MedicationData medication)
 	{
 		if (_patientGenerator.Patient.IsMedicationFit(medication))
@@ -75,6 +77,7 @@ public class SymptomsGameController : MonoBehaviour
 		}
 	}
 
+	// Генерация нового пациента
 	public void GenerateNewPatient()
 	{
 		_patient = _patientGenerator.GeneratePatient();
@@ -84,28 +87,33 @@ public class SymptomsGameController : MonoBehaviour
 		ClearTexts();
 	}
 
+	// Инициализация кнопки с заболеванием
 	public void InitDisease(int index, DiseaseData disease)
 	{
 		_diseaseButtons[index].Init(this, disease);
 	}
 
+	// Инициализация кнопки с лекарством
 	public void InitMedication(int index, MedicationData medication)
 	{
 		_medicationButtons[index].Init(this, medication);
 	}
 
+	// Инициализация при старте
 	private void Awake()
 	{
 		_patientDisplay = GetComponent<PatientDisplay>();
 		_patientGenerator = GetComponent<PatientGenerator>();
 	}
 
+	// Инициализация при запуске
 	private void Start()
 	{
 		_score = 0;
 		GenerateNewPatient();
 	}
 
+	// Отображение симптомов
 	private void DisplaySymptoms()
 	{
 		_symptomsText.text = "";
@@ -119,17 +127,19 @@ public class SymptomsGameController : MonoBehaviour
 		}
 	}
 
+	// Очистка текстов
 	public void ClearTexts()
 	{
 		_diagnosisText.text = "";
 		_medicationText.text = "";
 	}
 
+	// Получение урона
 	private void TakeDamage(ButtonType buttonType)
 	{
 		_heartsController.TakeDamage();
 
-		if (_heartsController.IsAlive == false)
+		if (!_heartsController.IsAlive)
 		{
 			_heartsController.ResetHearts();
 			_screenSwitcher.SwitchScreen(_gameOverMenu);
@@ -141,6 +151,7 @@ public class SymptomsGameController : MonoBehaviour
 		}
 	}
 
+	// Активация кнопок определенного типа
 	private void SetActiveButtons(ButtonType buttonType)
 	{
 		foreach (DiseaseButton button in _diseaseButtons)
